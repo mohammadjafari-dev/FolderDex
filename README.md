@@ -129,7 +129,7 @@ debug.bat      :: same, but keeps the console open to see errors
 
 ## What's new
 
-**0.54.0** — in preparation for release: hardens security and stability, and renames the
+**0.54.0** — in preparation for its official release: hardens security and stability, and renames the
 app to **FolderDex** (see [CHANGELOG.md](CHANGELOG.md)). The first public
 release was **0.52.0**; 0.53.0 added the WebP thumbnail cache and custom folder
 covers. Released under the GPL-3.0-or-later license, with a restructured

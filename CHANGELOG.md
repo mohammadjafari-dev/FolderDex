@@ -8,10 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 **Internal development history (Persian only):** [docs/HISTORY-pre-1.0.fa.md](docs/HISTORY-pre-1.0.fa.md)
 **Official repository:** [mohammadjafari-dev/FolderDex](https://github.com/mohammadjafari-dev/FolderDex)
 
-Before the first stable release this file stays one short summary: the single
-dated section below describes the current development state — not one section
-per internal build. Detailed per-version entries begin with the first stable
-release.
+Before the first stable release this file stays short: a single dated section
+describes the current development state — not one section per internal build —
+plus one explanatory section about the internal builds' version numbering.
+Detailed per-version entries begin with the first stable release.
 
 ## [0.54.0] - 2026-11-12
 
