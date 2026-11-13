@@ -12,7 +12,7 @@ PySide6-Essentials>=6.6,<7; python_version >= "3.12"
 Pillow>=10.0,<13
 py7zr>=1.0,<2
 rarfile>=4.1,<5
-pypdfium2>=4.30,<6
+pypdfium2>=5.15.2,<6
 # چرا Essentials و نه متاپکیج PySide6؟ کل برنامه فقط از QtCore/QtGui/QtWidgets
 # import می‌کند (اسکنِ import روی همه‌ی فایل‌های .py)؛ متاپکیج علاوه بر آن
 # ویل‌های Addons و Pdf و WebEngine را هم می‌کشد (حدود ۱۷۰MB دانلودِ اضافه،
