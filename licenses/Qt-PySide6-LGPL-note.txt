@@ -1,0 +1,43 @@
+Qt for Python (PySide6) — LGPL note / یادداشت لایسنس Qt
+========================================================
+
+(EN) The PySide6 wheels this application is built with are made available by
+the Qt Project under "LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only" (as
+stated in the wheel's dist-info/METADATA; verified on PySide6_Essentials
+6.12.0). This application uses PySide6 under **LGPL-3.0-only**; the full
+license text is in this folder: Qt-PySide6-LGPL-3.0.txt (the file contains
+the LGPL-3.0 text followed by the GPL-3.0 text it incorporates by
+reference).
+
+- Qt for Python project: https://www.qt.io/qt-for-python
+- Qt open-source downloads: https://www.qt.io/download/open-source
+- Source repository: https://code.qt.io/cgit/pyside/pyside-setup.git/
+- Qt documentation: https://doc.qt.io/qtforpython
+
+The Qt libraries are dynamically linked and the portable package is built
+one-dir (never one-file) on purpose, so that recipients can replace or
+relink the Qt libraries as the LGPL requires. The exact LGPL-3.0 text ships
+with every package in this licenses/ folder (the PySide6 wheels themselves
+do not embed a license file in dist-info, so the canonical text is tracked
+in this repository).
+
+------------------------------------------------------------
+
+(FA) ویل‌های PySide6 که این برنامه با آن‌ها ساخته می‌شود توسط پروژه‌ی Qt تحت
+«LGPL-3.0-only OR GPL-2.0-only OR GPL-3.0-only» عرضه می‌شوند (طبق
+dist-info/METADATA ویل؛ روی PySide6_Essentials نسخه‌ی 6.12.0 راستی‌آزمایی
+شده). این برنامه PySide6 را تحت **LGPL-3.0-only** استفاده می‌کند؛ متن کامل
+لایسنس در همین پوشه است: Qt-PySide6-LGPL-3.0.txt (این فایل، متنِ LGPL-3.0 را
+به‌همراه متنِ GPL-3.0 — که LGPL با ارجاع، آن را در برمی‌گیرد — در خود دارد).
+
+- پروژه‌ی Qt for Python: https://www.qt.io/qt-for-python
+- دریافت نسخه‌ی متن‌باز: https://www.qt.io/download/open-source
+- مخزن سورس: https://code.qt.io/cgit/pyside/pyside-setup.git/
+- مستندات: https://doc.qt.io/qtforpython
+
+کتابخانه‌های Qt به‌صورت داینامیک لینک می‌شوند و بسته‌ی پرتابل عمداً به‌صورت
+one-dir ساخته می‌شود (هرگز one-file نیست) تا گیرنده بتواند مطابق LGPL
+کتابخانه‌های Qt را جایگزین یا به کتابخانه‌ی دیگر متصل کند. متن کامل LGPL-3.0
+با هر بسته در همین پوشه‌ی licenses/ همراه است (خودِ ویل‌های PySide6 فایل
+لایسنسی داخل dist-info ندارند؛ از این رو متن رسمی در این ریپو نگه‌داری
+می‌شود).

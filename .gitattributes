@@ -1,0 +1,22 @@
+# Normalize line endings
+* text=auto
+
+# Windows scripts must keep CRLF
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Source files
+*.py text eol=lf
+*.md text
+*.json text
+*.txt text
+
+# Binary assets — never touch
+*.png binary
+*.jpg binary
+*.ico binary
+*.icns binary
+*.ttf binary
+*.exe binary
+*.db binary
+*.zip binary

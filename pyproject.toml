@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Mohammad Jafari
+
+# Tool configuration only — this file does not change how the app runs.
+# Ruff stays deliberately narrow (the code base is NOT reformatted) but wider
+# than syntax-only: unused imports/variables, redefined names and closures
+# that bind loop variables are real bugs this code base had before.
+
+[tool.ruff]
+target-version = "py311"
+extend-exclude = [".venv", ".build-venv", "build", "dist", "__pycache__", "vendor"]
+
+[tool.ruff.lint]
+# B008 (فراخوانی در آرگومانِ پیش‌فرض) بعد از باگِ دوزبانه‌ی D4 اضافه شد:
+# T(...) در default هنگامِ import منجمد می‌شد و کاربرِ فارسی متنِ انگلیسی
+# می‌دید. مواردِ بی‌خطرِ دیگر (مثل max(...)) با noqa: B008 علامت می‌شوند.
+select = ["E9", "F63", "F7", "F82", "F821", "F401", "F811", "F841", "B023", "B008"]
+
+[tool.coverage.run]
+omit = ["tests/*"]

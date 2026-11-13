@@ -1,0 +1,66 @@
+name: "🐞 Bug report (English)"
+description: Report something that isn't working
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: App version
+      description: Shown in the title bar
+      placeholder: "e.g. 0.54.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: Windows version
+      placeholder: "e.g. Windows 11 23H2"
+    validations:
+      required: true
+  - type: dropdown
+    id: player
+    attributes:
+      label: Player used for watch tracking
+      options:
+        - PotPlayer
+        - mpv
+        - VLC
+        - Other / not tracking
+    validations:
+      required: true
+  - type: dropdown
+    id: drive
+    attributes:
+      label: Drive type of the library
+      options:
+        - Internal SSD
+        - Internal HDD
+        - External USB drive
+        - Network drive
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Open …
+        2. Click …
+        3. See the error
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs. actual behavior
+      description: What should have happened, and what happened instead?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Debug log or screenshots (optional)
+      description: |
+        `folderdex-debug.log` next to the app, if the issue is graphical or a crash.
+        Remove personal paths first — the issue page is public.
+      placeholder: "Paste the relevant log lines or attach a screenshot"

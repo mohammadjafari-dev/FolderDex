@@ -1,0 +1,30 @@
+name: "✨ درخواست قابلیت (فارسی)"
+description: ایده‌ای که FolderDex را بهتر می‌کند پیشنهاد دهید
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: مسئله
+      description: |
+        می‌خواهید چه کاری انجام دهید و چه چیزی سر راهتان است؟
+        «نمی‌توانم X را پیدا کنم» مفیدتر از «دکمه‌ی Y را اضافه کنید» است.
+      placeholder: "مثلاً: وقتی تعداد پوشه‌ها زیاد می‌شود، پیدا کردن پوشه‌های دسته‌بندی‌نشده زمان‌بر است …"
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: راه‌حل پیشنهادی
+      description: دوست دارید چه اتفاقی بیفتد؟
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: گزینه‌های جایگزینی که در نظر گرفته‌اید (اختیاری)
+  - type: textarea
+    id: context
+    attributes:
+      label: توضیح بیشتر (اختیاری)
+      description: اسکرین‌شات هم مفید است — قبلاً مسیرهای شخصی را پاک کنید.

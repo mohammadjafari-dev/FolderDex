@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Mohammad Jafari
+
+# (C9) keep GitHub Actions and pip dependencies current — weekly, one PR per
+# ecosystem so the diff stays reviewable. Version updates only; security
+# alerts come from the Dependabot alerts tab.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+    # (round 28) shiboken6 6.12.0 crashes Python 3.11 at interpreter shutdown
+    # (round 22), so requirements.txt pins PySide6-Essentials with
+    # python_version markers; a repo-integrity test and a CI guard step assert
+    # those exact lines. Dependabot's blanket bump edits the marker line and
+    # turned every job red (branch dependabot/pip/pyside6-essentials-…, commit
+    # 8cf48fc) — this pin is managed by hand, so keep it out of version updates.
+    ignore:
+      - dependency-name: pyside6-essentials

@@ -1,0 +1,66 @@
+name: "🐞 گزارش باگ (فارسی)"
+description: مشکلی که در برنامه پیش آمده را گزارش کنید
+labels: ["bug"]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: نسخه‌ی برنامه
+      description: در نوار عنوان دیده می‌شود
+      placeholder: "مثلاً 0.54.0"
+    validations:
+      required: true
+  - type: input
+    id: windows
+    attributes:
+      label: نسخه‌ی ویندوز
+      placeholder: "مثلاً Windows 11 23H2"
+    validations:
+      required: true
+  - type: dropdown
+    id: player
+    attributes:
+      label: پخش‌کننده‌ای که برای ردیابی تماشا استفاده می‌کنید
+      options:
+        - PotPlayer
+        - mpv
+        - VLC
+        - دیگر / ردیابی نمی‌کنم
+    validations:
+      required: true
+  - type: dropdown
+    id: drive
+    attributes:
+      label: نوع درایوی که کتابخانه روی آن است
+      options:
+        - SSD داخلی
+        - هارد داخلی
+        - درایو USB اکسترنال
+        - درایو شبکه
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: مراحل بازتولید مشکل
+      placeholder: |
+        ۱. باز کردن …
+        ۲. کلیک روی …
+        ۳. دیدن خطا
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: رفتار مورد انتظار و رفتار واقعی
+      description: چه چیزی باید اتفاق می‌افتاد و چه چیزی افتاد؟
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: لاگ دیباگ یا اسکرین‌شات (اختیاری)
+      description: |
+        اگر مشکل گرافیکی یا کرش است، فایل `folderdex-debug.log` کنار برنامه.
+        قبل از ارسال مسیرهای شخصی را پاک کنید — صفحه‌ی Issue عمومی است.
+      placeholder: "خط‌های مربوط به لاگ را بچسبانید یا اسکرین‌شات پیوست کنید"

@@ -1,0 +1,54 @@
+__pycache__/
+*.pyc
+.venv/
+build/
+dist/
+.thumb_cache/
+demo_library/
+config.json
+data.json
+config.demo.json
+data.demo.json
+data.demo.db
+.build-venv/
+# پلاگین‌های vendored (مثل pillow_jxl) فقط محلی‌اند — هرگز در گیت نمی‌روند:
+# باینری‌های ویندوزیِ سنگین‌اند، هدرِ SPDX ندارند و تستِ یکپارچگیِ مخزن را
+# می‌شکنند؛ BUILD.bat هم دیگر هیچ ارجاعی به این پوشه ندارد.
+vendor/
+folderdex-debug.log
+folderdex-error.log
+folderdex-launcher.log
+folderdex-diag.log
+covershelf-debug.log
+covershelf-error.log
+covershelf-launcher.log
+covershelf-diag.log
+media-cataloger-debug.log
+media-cataloger-error.log
+*.spec
+*-win64-portable.zip
+
+# --- داده‌ی واقعیِ کاربر کنار برنامه — هرگز کامیت نشود ---
+data.db
+data.db-shm
+data.db-wal
+data.db-journal
+backups/
+*.mcbak
+.mc_import_*
+.no_archive_pkgs
+.covers/
+.requirements_failed
+.coverage
+htmlcov/
+coverage.json
+pytest-output.txt
+*.pre-canonical.bak
+
+# --- artifacts of the round-based delivery workflow — local only ---
+# گزارش/ممیزیِ نوبتی و برگهٔ «اول این را بخوان» فقط داخلِ زیپِ تحویل‌اند.
+# کامیتِ تصادفی‌شان در round 19 و round 20 CI را قرمز کرد (round 19) یا
+# بدهیِ بهداشتی ساخت (round 20)؛ این‌طوری حتی git add -A هم برنمی‌داردشان.
+ROUND*-report*.md
+ROUND*-audit*.md
+_READ-ME-FIRST*

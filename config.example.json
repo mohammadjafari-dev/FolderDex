@@ -1,0 +1,35 @@
+{
+  "roots": [
+    {
+      "path": "D:/انیمه",
+      "category": "انیمه"
+    },
+    {
+      "path": "E:/فیلم",
+      "category": "فیلم"
+    },
+    {
+      "path": "E:/بازی",
+      "category": "بازی"
+    },
+    {
+      "path": "F:/آموزش",
+      "category": "آموزش"
+    }
+  ],
+  "categories": [
+    "انیمه",
+    "فیلم",
+    "بازی",
+    "آموزش"
+  ],
+  "category_colors": {
+    "انیمه": "#a78bfa",
+    "فیلم": "#38bdf8",
+    "بازی": "#4ade80",
+    "آموزش": "#fbbf24"
+  },
+  "include_image_fallback": true,
+  "compute_durations": true,
+  "theme": "dark"
+}

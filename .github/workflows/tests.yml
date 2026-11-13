@@ -1,0 +1,123 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Mohammad Jafari
+
+name: tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+# (C9) default token is read-only — the actions need nothing more
+permissions:
+  contents: read
+
+jobs:
+  pytest:
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        # the app is Windows-first; ubuntu/3.12 additionally guards the
+        # platform-independent logic (state parsing, backup round trip, ...)
+        os: [windows-latest]
+        python-version: ["3.11", "3.12", "3.13"]
+        include:
+          - os: ubuntu-latest
+            python-version: "3.12"
+    env:
+      # never open a window, even if a test pulls PySide6 transitively
+      QT_QPA_PLATFORM: offscreen
+      # utf-8 everywhere: default open() encoding and stdio on Windows
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0 (pinned, C9; node24-native)
+
+      # Round 14 (P0): runner images — Ubuntu 24.04 and 26.04 alike — ship
+      # without the GL stack the bundled PySide6 links against, so
+      # `import PySide6.QtWidgets` died with `ImportError: libEGL.so.1` and
+      # pytest interrupted at collection (exit code 2) from round 11 on
+      # (first Qt-importing test modules). The Windows wheels bundle
+      # everything, which is why only the Linux job was red.
+      - name: Install Qt runtime system libs (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libegl1 libgl1
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0 (pinned, C9; node24-native)
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-cov ruff
+
+      # Round 23: shiboken6 6.12.0 crashes the interpreter at shutdown on
+      # Python 3.11 (upstream bug, see CHANGELOG round 22). requirements.txt
+      # caps PySide6-Essentials < 6.12 there via a python_version marker —
+      # this step fails loudly if the cap ever stops being honored.
+      - name: "Guard: shiboken6 must be < 6.12 on Python 3.11"
+        if: matrix.python-version == '3.11'
+        run: |
+          python -c "import shiboken6; v = tuple(int(p) for p in shiboken6.__version__.split('.')[:2]); assert v < (6, 12), 'shiboken6 ' + shiboken6.__version__ + ' must not be installed on Python 3.11 (round 22 shutdown crash)'"
+
+      - name: Byte-compile every file
+        run: python -m compileall -q .
+
+      - name: Lint (ruff — real errors + F401/F841/B023/B008, vendor excluded)
+        run: ruff check .
+
+      - name: Run tests with coverage
+        shell: bash
+        run: |
+          # (round 19 §0) tee keeps the full pytest output in a file so a red
+          # job can be diagnosed from the artifact without an admin API call.
+          # pipefail preserves pytest's real exit code.
+          set -o pipefail
+          python -m pytest tests/ --cov=. --cov-report=term-missing --cov-report=json:coverage.json -q 2>&1 | tee pytest-output.txt
+
+      - name: Upload pytest output (failure diagnostics)
+        if: failure()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0 (pinned, node24-native)
+        with:
+          name: pytest-output-${{ matrix.os }}-${{ matrix.python-version }}
+          path: pytest-output.txt
+          if-no-files-found: ignore
+
+      - name: Coverage summary into the job summary
+        if: always()
+        shell: bash
+        run: |
+          python -c "import json,pathlib;t=json.loads(pathlib.Path('coverage.json').read_text(encoding='utf-8'))['totals'];print('## Coverage (pytest-cov)\n**{:.1f}%** covered — {}/{} statements.'.format(t['percent_covered'],t['covered_lines'],t['num_statements']))" >> "$GITHUB_STEP_SUMMARY" \
+            || echo "coverage.json unavailable" >> "$GITHUB_STEP_SUMMARY"
+
+  repo-integrity:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6.1.0 (pinned, C9; node24-native)
+
+      - name: Set up Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0 (pinned, C9; node24-native)
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Repository integrity checks (pure file checks, stdlib only)
+        run: python -m pytest tests/test_repo_integrity.py -v
