@@ -13,7 +13,7 @@ describes the current development state — not one section per internal build �
 plus one explanatory section about the internal builds' version numbering.
 Detailed per-version entries begin with the first stable release.
 
-## [0.55.0] - 2026-11-14
+## [0.55.1] - 2026-11-14
 
 ### Summary
 
@@ -42,17 +42,29 @@ Detailed per-version entries begin with the first stable release.
   two short rows and the add-category dialog sizes itself from its content,
   so nothing clips at 100–150% display scaling (reported clipping of the
   word «دسته»)
+- The real fix for the clipped «دسته» — the absolute offset `right: 12px` on
+  `QGroupBox::title` in the shared stylesheet made Qt cleanly clip the FIRST
+  glyph of every RTL group-box title (and the first letter of LTR titles) at
+  narrow widths — a Qt subcontrol-offset behavior, not a dialog-size problem,
+  which is why the 0.55.0 width fix could not remove it. The stylesheet now
+  insets the title with the box-model `margin-right: 12px` and pixel
+  regression tests pin the rendered title ink in both RTL and LTR (reported
+  as “still invisible on 0.55.0”)
+- The card counter behavior is documented as intentional — for a video
+  folder the badge counts episodes («N قسمت») and the cover image, shown as
+  the thumbnail, is not an episode; it stays in the total file count and the
+  details file list
 - Theme-name mismatch between the READMEs/FEATURES and the actual in-app
   labels fixed in all four docs
 
-## Early versions (0.1.0 to 0.55.0)
+## Early versions (0.1.0 to 0.55.1)
 
 FolderDex was developed as internal builds for a long time, numbered
 retroactively as 0.1.0–0.51.0 (internal vN = 0.N.0); none of them was ever
 publicly released. Persian notes for the builds that have them
 (0.21.0–0.48.0) live in [docs/HISTORY-pre-1.0.fa.md](docs/HISTORY-pre-1.0.fa.md).
 
-0.52.0–0.55.0 were the first public releases. The main work of this period:
+0.52.0–0.55.1 were the first public releases. The main work of this period:
 
 - **0.52.0** — the first public release: the multi-drive offline library for
   folders and loose files, the cover and auto-preview chain, watch-state
@@ -71,6 +83,8 @@ publicly released. Persian notes for the builds that have them
   joined the originals, and a read-only app folder falls back to a temporary
   cache with a clear message instead of dying at startup
 - **0.55.0** — bug-fix round from the user's report (see the section above)
+- **0.55.1** — the root-cause fix for the clipped group-box titles (see the
+  section above)
 
 From the first stable release (1.0.0) on, every release gets its own
 detailed entry (Added / Changed / Fixed / Security) in this file.

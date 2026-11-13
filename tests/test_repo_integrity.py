@@ -500,9 +500,9 @@ def test_no_stale_version_or_history_name_in_docs():
             continue          # آرشیوِ خام / متن‌های verbatim حقوقی — معاف
         text = p.read_text(encoding="utf-8", errors="replace")
         # هر نسخه‌ای که هنوز منتشر نشده نباید در مستندات دیده شود —
-        # با هر bump این نگهبان به نسخه‌ی بعدی می‌رود (round 32: انتشارِ فعلی
-        # 0.55.0 است — نگهبان روی 0.56.0)
-        assert "0.56.0" not in text, f"{rel}: stale 0.56.0 reference (release is 0.55.0)"
+        # با هر bump این نگهبان به نسخه‌ی بعدی می‌رود (round 33: انتشارِ فعلی
+        # 0.55.1 است — نگهبان روی 0.56.0)
+        assert "0.56.0" not in text, f"{rel}: stale 0.56.0 reference (release is 0.55.1)"
         assert "HISTORY-v1-v49" not in text, f"{rel}: old history file name"
         # هیچ 1.0.xی نباید به‌عنوان نسخه‌ی فعلی/گذشته‌ی برنامه بماند؛ فقط
         # خطِ گذارِ «نخستین انتشار پایدار» می‌تواند به 1.0.0 اشاره کند

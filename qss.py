@@ -223,7 +223,7 @@ QTreeWidget#FileTree::branch:has-children:open {
 
 QGroupBox { border: 1px solid @border2@; border-radius: 10px; margin-top: 12px;
             padding: 10px; font-weight: bold; }
-QGroupBox::title { subcontrol-origin: margin; right: 12px; padding: 0 6px; }
+QGroupBox::title { subcontrol-origin: margin; margin-right: 12px; padding: 0 6px; }
 
 /* ---------------- هدر بخش محتوا ---------------- */
 #PageTitle { font-size: 19px; font-weight: 800; background: transparent; }
