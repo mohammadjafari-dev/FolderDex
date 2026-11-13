@@ -11,7 +11,7 @@ PySide6-Essentials>=6.6,<7; python_version >= "3.12"
 # روی ۳٫۱۱ نسخهٔ shiboken6 را assert می‌کند.
 Pillow>=10.0,<13
 py7zr>=1.0,<2
-rarfile>=4.1,<5
+rarfile>=4.5,<5
 pypdfium2>=4.30,<6
 # چرا Essentials و نه متاپکیج PySide6؟ کل برنامه فقط از QtCore/QtGui/QtWidgets
 # import می‌کند (اسکنِ import روی همه‌ی فایل‌های .py)؛ متاپکیج علاوه بر آن
