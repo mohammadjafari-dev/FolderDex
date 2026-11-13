@@ -1207,6 +1207,16 @@ class MainWindow(QMainWindow):
         if durations is not None:
             totals, manifests = durations
             self.store.set_total_durations(totals, manifests)
+        # round 32 — مواردِ اخیرِ یتیم (مسیرِ جابه‌جا/حذف‌شده) بعد از هر اسکنِ
+        # کامل پاک می‌شوند تا عددِ کنارِ «🕘 موارد اخیر» با واقعیت یکی باشد
+        # (گزارش کاربر: «۱۵ ولی ۹ می‌نویسد»). قبل از set_items تا سایدبارِ
+        # تازه عددِ پاک‌شده را نشان دهد. اگر کتابخانه خالی است (درایوِ خاموش/
+        # اسکنِ ناکام) هیچ‌چیز پاک نمی‌شود — خرابیِ موقت تاریخچه را نابود نمی‌کند.
+        if self.items:
+            try:
+                self.store.prune_recents([str(i.path) for i in self.items])
+            except Exception as _exc_dbg:
+                dbg_log(f"prune_recents failed: {type(_exc_dbg).__name__}")
         self.library.set_items(self.items)
         self.library.set_busy(False)
         self.scan_chip.hide()

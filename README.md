@@ -49,7 +49,7 @@ it for this public release.
 - **Missing-path handling** — after a backup merge, folder paths that moved to another drive are fixed automatically; missing items can be re-pointed or removed
 - **Automatic atomic backup** — single-file `.mcbak`, written only on real changes, non-destructive merge with security snapshots
 - **Recents sidebar** — your last 15 opened titles, one click away
-- **Bilingual + 8 themes** — complete English/Persian UI, Light / Dim / Dark / AMOLED / Forest / Sunset / Ocean / Paper
+- **Bilingual + 8 themes** — complete English/Persian UI, Dark Blue / Dark Gray / Pure Black (AMOLED) / Light / Forest / Sunset / Ocean / Paper
 - **Local thumbnail cache** — video, archive, PDF and image previews cached as WebP (decoded natively by Qt), rebuilt only when needed
 - **Smooth display on huge libraries** — cards are prepared before they appear and speed modes adapt to the disk type (SSD or spinning drive)
 

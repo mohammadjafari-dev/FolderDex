@@ -505,15 +505,24 @@ TYPE_ORDER = ("video", "image", "archive", "doc", "audio", "other")
 def gather_stats(folder: Path) -> tuple[int, int, int, dict]:
     """(تعداد فایل، تعداد ویدیو، حجم، شمارش هر نوع) — شمارش نوع‌ها برای
     «نوع غالب محتوا» در مرتب‌سازی صفحه‌ی اصلی استفاده می‌شود (0.23.0) و چون از
-    همان پیمایش همیشگیِ پوشه می‌آید هزینه‌ی اضافی تقریباً صفر است."""
+    همان پیمایش همیشگیِ پوشه می‌آید هزینه‌ی اضافی تقریباً صفر است.
+
+    round 32 (گزارش کاربر: «صفحه‌ی اصلی می‌گوید ۱ فایل، جزئیات می‌گوید ۰ فایل»):
+    فیلترِ فایل‌ها دقیقاً همان فیلترِ get_file_tree شد — فایل‌های نقطه‌ای و
+    سیستمیِ ویندوز (desktop.ini/thumbs.db) از شمارش و حجم حذف شدند تا
+    شمارنده‌ی کارت و شمارنده‌ی صفحه‌ی جزئیات همیشه از یک قانون بیایند.
+    (تصویرِ کاور دیگر از فهرستِ جزئیات حذف نمی‌شود، پس هر دو یک عدد می‌گویند.)"""
     files = videos = size = 0
     type_counts = {"video": 0, "image": 0, "archive": 0,
                    "doc": 0, "audio": 0, "other": 0}
     # _winfix: مسیرهای خیلی بلند ویندوز (>۲۴۰) هم با پیشوند \\?\ خوانده شوند
     for _root, dirs, names in os.walk(_winfix(folder)):
         dirs[:] = [d for d in dirs if d.lower() not in IGNORED_DIRS
+                   and not d.startswith(".")
                    and not _is_junction(os.path.join(_root, d))]   # round 19 §16
         for name in names:
+            if name.startswith(".") or name.lower() in HIDDEN_FILES:
+                continue                       # round 32 — هماهنگ با get_file_tree
             files += 1
             try:
                 size += (Path(_root) / name).lstat().st_size

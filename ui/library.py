@@ -639,8 +639,12 @@ class LibraryPage(QWidget):
         self.cats.addTopLevelItem(make(T("⭐  علاقه‌مندی‌ها ({0})").format(fa(favs)), "fav", bold=True))
         # درخواست کاربر: «🕘 موارد اخیر» — آخرین عنوان‌های پخش/بازشده
         # (بازبینی نام: پیشنهادِ خود کاربر — «موارد اخیر یا یک همچین چیزی»)
-        _paths48 = {str(i.path) for i in self.items}
-        _rec48 = [p for p in self.store.recents() if p in _paths48]
+        # round 32: مقایسه با کلیدِ یکسان‌شده‌ی مسیر (normcase/normpath) —
+        # قبلاً رشته‌ی خام بود و شکلِ متفاوتِ همان مسیر از عددِ کنارِ
+        # «موارد اخیر» می‌افتاد (گزارش کاربر: «۱۵ ولی ۹ می‌نویسد»).
+        _paths48 = {self.store.norm_path(i.path) for i in self.items}
+        _rec48 = [p for p in self.store.recents()
+                  if self.store.norm_path(p) in _paths48]
         self.cats.addTopLevelItem(make(T("🕘  موارد اخیر ({0})").format(fa(len(_rec48))), "recent", bold=True))
 
         nodes: dict[str, QTreeWidgetItem] = {}
@@ -942,7 +946,9 @@ class LibraryPage(QWidget):
         # fa_norm: «ي/ك» عربی، نیم‌فاصله و کشیده مهم نیستند — جستجوی فارسی واقعی
         q = fa_norm(self.search.text().strip())
         # نقشه‌ی «موارد اخیر» (برای فیلتر + مرتب‌سازی بازگشتی) و فیلتر وضعیت تماشا
-        _rmap48 = ({p: i for i, p in enumerate(self.store.recents())}
+        # round 32: کلیدِ نقشه مسیرِ یکسان‌شده است — همان کلید در فیلتر و مرتب‌سازی
+        _rmap48 = ({self.store.norm_path(p): i
+                    for i, p in enumerate(self.store.recents())}
                    if self.filter_kind == "recent" else {})
         _wf48 = str(self.watch_filter.currentData() or "همه")
         out = []
@@ -952,7 +958,7 @@ class LibraryPage(QWidget):
                 continue
             if self.filter_kind == "cat" and not Store.matches(cat, self.filter_cat):
                 continue
-            if self.filter_kind == "recent" and str(it.path) not in _rmap48:
+            if self.filter_kind == "recent" and self.store.norm_path(it.path) not in _rmap48:
                 continue
             if _wf48 != "همه":                     # فیلتر وضعیت تماشا
                 _d48, _p48 = self.store.watch_progress(it)   # (دیده‌شده، نیمه‌تمام)
@@ -974,7 +980,7 @@ class LibraryPage(QWidget):
             out.append(it)
 
         if self.filter_kind == "recent":           # تازه‌ترین اول، بدون مرتب‌سازی دستی
-            out.sort(key=lambda i: _rmap48.get(str(i.path), 999))
+            out.sort(key=lambda i: _rmap48.get(self.store.norm_path(i.path), 999))
             return out
 
         mode = self.sort_combo.currentData() or self.sort_combo.currentText()

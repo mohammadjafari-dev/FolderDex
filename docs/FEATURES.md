@@ -113,7 +113,7 @@ Language: [English](FEATURES.md) · [فارسی](FEATURES.fa.md)
 
 - Complete English and Persian UI with automatic RTL/LTR switching; English is the
   default for new installs and your choice is remembered
-- Eight themes: Light, Dim, Dark, AMOLED, Forest, Sunset, Ocean, Paper — all with the same tested contrast contract (WCAG luminance)
+- Eight themes: Dark Blue, Dark Gray, Pure Black (AMOLED), Light, Forest, Sunset, Ocean, Paper — all with the same tested contrast contract (WCAG luminance)
 - Splash screen, tree and grid detail views, category filters in the header
 - Keyboard shortcuts on the details page: `W` watched, `F` favorite, `Space` play,
   `Alt+←/→` history; mouse back/forward buttons work like a browser

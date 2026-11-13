@@ -11,11 +11,11 @@ from i18n import T
 from pathlib import Path
 
 from PySide6.QtCore import Qt, Signal
-from PySide6.QtGui import QBrush, QColor
+from PySide6.QtGui import QBrush, QColor, QGuiApplication
 from PySide6.QtWidgets import (
-    QAbstractItemView, QCheckBox, QComboBox, QDialog, QDialogButtonBox,
-    QFormLayout, QGroupBox, QHBoxLayout, QHeaderView, QLabel,
-    QLineEdit, QListWidget, QListWidgetItem, QPlainTextEdit, QPushButton,
+    QAbstractItemView, QCheckBox, QColorDialog, QComboBox, QDialog,
+    QDialogButtonBox, QFormLayout, QGroupBox, QHBoxLayout, QHeaderView, QLabel,
+    QLineEdit, QListWidget, QListWidgetItem, QMenu, QPlainTextEdit, QPushButton,
     QScrollArea, QTabWidget, QTableWidget, QTableWidgetItem, QVBoxLayout, QWidget,
 )
 
@@ -89,7 +89,10 @@ class CategoryDialog(QDialog):
         self.store = store
         self.create_only = create_only
         self.setWindowTitle(T("ساخت دسته/زیردسته") if create_only else T("انتخاب دسته‌بندی"))
-        self.setMinimumWidth(380)
+        # round 32 (گزارش کاربر: «کلمه‌ی دسته دیده نمی‌شود و خارجِ کادره است») —
+        # عرضِ حداقل از روی اندازه‌ی واقعیِ محتوا (sizeHint) حساب می‌شود، نه عددِ
+        # ثابتِ 380؛ با فونت/مقیاسِ نمایشِ متفاوت هم هیچ برچسبی بریده نمی‌شود.
+        self.setMinimumWidth(0)
 
         lay = QVBoxLayout(self)
         lay.setSpacing(10)
@@ -142,6 +145,10 @@ class CategoryDialog(QDialog):
         btns.accepted.connect(self._accept)
         btns.rejected.connect(self.reject)
         lay.addWidget(btns)
+
+        # عرضِ حداقلی = اندازه‌ی واقعیِ محتوا (حداقلِ امنِ ۴۲۰) — چیدمانِ کامل
+        # ساخته شده پس sizeHint معتبر است؛ دیالوگ کوچک‌تر از متنِ برچسب‌ها نمی‌شود.
+        self.setMinimumWidth(max(420, self.sizeHint().width()))
 
     def _on_pick_change(self, _i):
         creating = self.pick_combo.currentData() == _NEW
@@ -1139,6 +1146,9 @@ class SettingsDialog(QDialog):
         self.cat_list.setObjectName("CatListBox")
         lay.addWidget(self.cat_list, 1)
 
+        # round 32 (گزارش کاربر: «کلمه‌ی دسته دیده نمی‌شود و خارجِ کادره است») —
+        # چهار دکمه در یک ردیف با حداقلِ عرضِ 700px جا نمی‌شدند و آخرین دکمه‌ها
+        # بیرون از کادر بریده می‌شدند؛ حالا دو ردیفِ کوتاه — در هر عرضی سالم است.
         btns = QHBoxLayout()
         b_addcat = QPushButton(T("➕ افزودن دسته/زیردسته‌ی جدید…"))
         b_addcat.setObjectName("PrimaryBtn")
@@ -1146,17 +1156,21 @@ class SettingsDialog(QDialog):
         self.btn_delcat = QPushButton(T("🗑 حذف دسته‌ی بلااستفاده"))
         self.btn_delcat.setObjectName("FlatBtn")
         self.btn_delcat.clicked.connect(self._del_category_confirm)
+        btns.addWidget(b_addcat)
+        btns.addWidget(self.btn_delcat)
+        btns.addStretch(1)
+        lay.addLayout(btns)
+
+        btns2 = QHBoxLayout()
         b_profs = QPushButton(T("🧩 الگوهای وضعیت سفارشی…"))
         b_profs.clicked.connect(self._manage_track_profiles)
         b_openers = QPushButton(T("📂 برنامه‌های بازکننده‌ی دسته‌ها…"))
         b_openers.setObjectName("FlatBtn")
         b_openers.clicked.connect(self._manage_cat_openers)
-        btns.addWidget(b_addcat)
-        btns.addWidget(self.btn_delcat)
-        btns.addWidget(b_profs)
-        btns.addWidget(b_openers)
-        btns.addStretch(1)
-        lay.addLayout(btns)
+        btns2.addWidget(b_profs)
+        btns2.addWidget(b_openers)
+        btns2.addStretch(1)
+        lay.addLayout(btns2)
 
         hint = QLabel(
             T("دسته‌هایی که مسیر یا عنوانی مستقیماً از آن‌ها استفاده می‌کند قابل حذف نیستند. "
@@ -1228,6 +1242,19 @@ class SettingsDialog(QDialog):
             hl = QHBoxLayout(row)
             hl.setContentsMargins(10, 2, 10, 2)
             hl.setSpacing(10)
+            # round 32 (درخواست کاربر: «رنگ دسته‌بندی‌ها رو نمی‌شه عوض کرد؟») —
+            # دکمه‌ی رنگِ هر دسته: کلیک ← منو (انتخاب رنگ/خودکار/کپیِ کد).
+            sw = QPushButton()
+            sw.setFixedSize(24, 24)
+            sw.setCursor(Qt.CursorShape.PointingHandCursor)
+            sw.setToolTip(T("🎨 رنگِ دسته — انتخاب رنگ، بازگشت به خودکار، کپیِ کد"))
+            sw.setStyleSheet(
+                f"QPushButton {{ background: {self.store.color(c)};"
+                f" border: 1px solid rgba(128,128,128,0.55);"
+                f" border-radius: 7px; }}"
+                f"QPushButton:hover {{ border: 1px solid rgba(200,200,200,0.9); }}")
+            sw.clicked.connect(lambda _chk=False, cc=c, btn=sw: self._pick_cat_color(cc, btn))
+            hl.addWidget(sw)
             name_lbl = QLabel(_display(c) + ("" if used else T("   (بلااستفاده)")))
             name_lbl.setStyleSheet(
                 f"color: {self.store.color(c)}; font-weight: bold;")
@@ -1246,6 +1273,36 @@ class SettingsDialog(QDialog):
             li.setSizeHint(row.sizeHint())
             self.cat_list.addItem(li)
             self.cat_list.setItemWidget(li, row)
+
+    def _pick_cat_color(self, cat: str, swatch: QWidget | None = None):
+        """منوی رنگِ یک دسته — round 32 (درخواست کاربر: «رنگ دسته‌بندی‌ها رو
+        نمی‌شه عوض کرد؟»): انتخاب رنگ دلخواه، بازگشت به خودکار، کپیِ کد رنگ.
+        رنگ‌ها در category_colors ذخیره می‌شوند و سایدبار/کارت‌ها/جزئیات همگی
+        از store.color() می‌خوانند پس بعد از ذخیره با یک refresh تازه می‌شوند."""
+        menu = QMenu(self)
+        a_pick = menu.addAction(T("انتخاب رنگ…"))
+        a_auto = menu.addAction(T("بازگشت به رنگِ خودکار"))
+        a_copy = menu.addAction(T("کپی کد رنگ"))
+        if swatch is not None:
+            act = menu.exec(swatch.mapToGlobal(swatch.rect().bottomLeft()))
+        else:
+            act = menu.exec(self.mapToGlobal(self.rect().center()))
+        menu.deleteLater()   # تجمعِ QObject در نشستِ بلند — آزسازیِ قطعی
+        if act is None:
+            return
+        if act is a_pick:
+            col = QColorDialog.getColor(QColor(self.store.color(cat)), self,
+                                        T("🎨 رنگِ دسته"))
+            if col.isValid():
+                if self.store.set_category_color(cat, col.name()):
+                    self.cats_changed = True
+                    self._refresh_cats()
+        elif act is a_auto:
+            if self.store.set_category_color(cat, None):
+                self.cats_changed = True
+                self._refresh_cats()
+        elif act is a_copy:
+            QGuiApplication.clipboard().setText(self.store.color(cat))
 
     def _add_category(self):
         current = self.cat_list.currentItem()

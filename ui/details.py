@@ -78,7 +78,7 @@ from PySide6.QtWidgets import (
 
 from scanner import (
     LOOSE_DOC_EXTS, get_file_hierarchy, get_file_tree, fa, human_size,
-    is_reserved_cover, item_watchables,
+    item_watchables,
     natural_key, file_type_group, TYPE_ORDER, VIDEO_EXTS,
 )
 
@@ -468,7 +468,15 @@ class ThumbCard(QFrame):
         base = self._size_text
         self._size_label.setText(f"{base} · {text}" if base else text)
 
-    def set_watch(self, mode: int, pos: float = 0.0):
+    def set_tag(self, tag: str):
+        """نشانِ متادیتا روی کارت (مثل «کاور») — round 32: فایلِ کاور از
+        فهرستِ فایل‌ها حذف نمی‌شود، پس کارتش باید قابلِ تشخیص باشد."""
+        if not tag:
+            return
+        base = self._size_text
+        self._size_label.setText(f"{tag} · {base}" if base else tag)
+
+    def set_watch(self, mode: int, pos: float = 0.0, page_based: bool = False):
         if mode == Store.WATCH_DONE:
             self._watch_badge.setText("✓")
             self._watch_badge.setStyleSheet(
@@ -479,9 +487,16 @@ class ThumbCard(QFrame):
             self._watch_badge.show()
             self._name_label.setStyleSheet("font-size:11px; color:#4ade80;")
         elif mode == Store.WATCH_PART:
-            # ویدیو: ◐ + موقعیت رزومه — سند/فشرده (pos=0): فقط ◐ (نیمه‌خوانده)
-            self._watch_badge.setText(
-                "◐ " + format_duration_short(pos) if pos else "◐")
+            # round 32 (گزارش کاربر: «برای کتاب به‌جای صفحه ۵ می‌نویسد ثانیه ۵») —
+            # واحدِ پیشرفت از نوعِ فایل می‌آید: ویدیو/صوت → زمانِ رزومه؛
+            # سند/کتاب/فشرده → «صفحه‌ی N». pos=0 → فقط ◐ (نیمه‌خوانده).
+            if pos and page_based:
+                badge_txt = "◐ " + T("صفحه‌ی {0}").format(fa(int(pos)))
+            elif pos:
+                badge_txt = "◐ " + format_duration_short(pos)
+            else:
+                badge_txt = "◐"
+            self._watch_badge.setText(badge_txt)
             self._watch_badge.setStyleSheet(
                 "background:#b45309; color:#fff; border-radius:9px;"
                 "padding:1px 6px; font-size:10.5px; font-weight:bold;")
@@ -920,8 +935,15 @@ class DetailsPage(QWidget):
         self._refresh_desc()
 
         # داده‌ی فایل‌ها
-        exclude = {p for p in (item.icon_path, st.poster_of(item))
-                   if p and is_reserved_cover(p)}
+        # round 32 (گزارش کاربر: «فایلِ تصویری که کاور شده نشان داده نمی‌شود؛
+        # باید همه‌ی فایل‌های داخل پوشه را نشان بدهد») — تصویرِ کاور/آیکون دیگر
+        # از فهرستِ فایل‌های جزئیات حذف نمی‌شود: همان فایل هم کاورِ بالای صفحه
+        # است و هم یک فایلِ واقعیِ مجموعه؛ روی کارتش نشانِ «کاور» می‌آید.
+        # فایل‌های سیستمی (desktop.ini/thumbs.db) و نقطه‌ای‌ها همچنان در خودِ
+        # get_file_tree فیلتر می‌شوند — قاعده‌ی واحد با gather_stats.
+        exclude: set = set()
+        self._cover_paths = {str(p) for p in (getattr(item, "icon_path", None),
+                                              st.poster_of(item)) if p}
         loose = getattr(item, "loose_group", False)
         # گروه اسنادِ ریشه فقط فشرده/PDF نمایش می‌دهد (ویدیوها کارت جدای خودشان را دارند)
         only = LOOSE_DOC_EXTS if getattr(item, "loose_docs_only", False) else None
@@ -1877,7 +1899,14 @@ class DetailsPage(QWidget):
         """افکت بصری وضعیت روی آیتم درخت یا کارت."""
         try:
             if isinstance(owner, ThumbCard):
-                owner.set_watch(mode, pos)
+                # round 32: واحدِ بجِ ◐ از نوعِ فایل می‌آید — ویدیو «زمان»،
+                # کتاب/سند «صفحه‌ی N» (گزارش کاربر: «ثانیه ۵ به‌جای صفحه‌ی ۵»).
+                try:
+                    _resume_ok = self._status_labels(owner.path)[3]
+                except Exception as _exc_dbg:
+                    dbg_log(f"_apply_watch labels failed: {type(_exc_dbg).__name__}")
+                    _resume_ok = owner.path.suffix.lower() in VIDEO_EXTS
+                owner.set_watch(mode, pos, page_based=not _resume_ok)
             elif isinstance(owner, QTreeWidgetItem):
                 name_txt = owner.data(0, Qt.ItemDataRole.UserRole + 1) or owner.text(0)
                 if mode == Store.WATCH_DONE:
@@ -2339,6 +2368,14 @@ class DetailsPage(QWidget):
         card = ThumbCard(f, placeholder_poster(f.suffix.lstrip(".")[:1] or T("؟"),
                                                "#33507c", 132, 132, 10), size_text)
         card.rel = rel_of(self.item, f)
+        # round 32: فایلِ کاور/آیکون از فهرست حذف نمی‌شود — روی کارتش نشانِ
+        # «کاور/آیکون پوشه» می‌آید تا کاربر بداند این همان تصویرِ عنوان است.
+        try:
+            if str(f) in (getattr(self, "_cover_paths", None) or set()):
+                card.set_tag(T("آیکون پوشه") if f.suffix.lower() in (".ico", ".icl")
+                             else T("کاور"))
+        except RuntimeError as _exc_dbg:
+            dbg_log(f"cover tag failed: {type(_exc_dbg).__name__}")
 
         def _menu(c, gp):
             ext = c.path.suffix.lower()

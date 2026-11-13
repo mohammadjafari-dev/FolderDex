@@ -82,6 +82,9 @@ PALETTE = [
     "#22d3ee",  # سیان
 ]
 
+# رنگِ دست‌سازِ دسته‌ها — فقط ‎#rrggbb‎ معتبر پذیرفته می‌شود (round 32)
+_HEX6_RE = re.compile(r"^#[0-9a-f]{6}$")
+
 DEFAULT_CONFIG = {
     "roots": [],
     "categories": [],
@@ -731,6 +734,32 @@ class Store:
             colors[name] = PALETTE[len(colors) % len(PALETTE)]
         return colors[name]
 
+    def set_category_color(self, name: str, color) -> bool:
+        """رنگِ دست‌ساز برای یک دسته/زیردسته — round 32 (درخواست کاربر: «رنگ
+        دسته‌بندی‌ها رو نمی‌شه عوض کرد؟»).
+
+        color باید ‎#rrggbb‎ معتبر باشد؛ ‎None/""‎ یعنی «بازگشت به خودکار» —
+        رنگِ دست‌ساز حذف می‌شود و فراخوانیِ بعدیِ color() دوباره از پالت
+        برمی‌دارد (همان رفتارِ پیش‌فرضِ قبلی). زیردسته‌ها هم مستقل‌اند چون
+        کلیدِ category_colors بر اساسِ نامِ کامل است. ذخیره‌ی فوری — True اگر
+        چیزی عوض شد."""
+        name = str(name or "").strip()
+        if not name:
+            return False
+        colors = self.config.setdefault("category_colors", {})
+        if color:
+            c = str(color).strip().lower()
+            if not _HEX6_RE.match(c):
+                return False
+            changed = colors.get(name) != c
+            colors[name] = c
+        else:
+            changed = name in colors
+            colors.pop(name, None)
+        if changed:
+            self.save_config()
+        return changed
+
     # ---- باکس تغییر سریع دسته روی کارت‌ها (ریشه + همه‌ی فرزندها در یک باکس) ----
     def child_categories(self, cat: str) -> list[str]:
         """فرزندان مستقیم یک دسته (دقیقاً یک سطح پایین‌تر)، به ترتیب ثبت در تنظیمات."""
@@ -992,6 +1021,20 @@ class Store:
     # «بازشده‌های اخیر»). حداکثر RECENT_MAX مورد، تازه‌ترین اول.
     RECENT_MAX = 15
 
+    @staticmethod
+    def norm_path(p) -> str:
+        r"""کلیدِ یکسانِ مقایسه برای مسیرها — round 32 (گزارش کاربر: «موارد اخیر
+        ۱۵تاست ولی ۹ می‌نویسد»).
+
+        قبلاً مقایسه‌ی رشته‌ایِ خام بود؛ «‎C:\Lib\فیلم‎» و «‎c:\lib\فیلم\‎» (تفاوتِ
+        حروفِ بزرگ/کوچک، جداکننده، ‎..\‎ یا نبودِ آن) دو رکوردِ «جدید» می‌شدند و
+        شمارنده‌ی سایدبار با فهرستِ فیلترشده یکی نبود. ‎normcase+normpath+abspath‎
+        همان کلیدِ ویندوزیِ بی‌حس به بزرگ/کوچکی و جداکننده می‌سازد."""
+        try:
+            return os.path.normcase(os.path.normpath(os.path.abspath(str(p))))
+        except (OSError, ValueError, TypeError):
+            return str(p)
+
     def recents(self) -> list:
         r = self.config.get("recents")
         return [str(p) for p in r] if isinstance(r, list) else []
@@ -1000,12 +1043,39 @@ class Store:
         path = str(path)
         if not path:
             return
-        r = [p for p in self.recents() if p != path]
+        # تکراری‌ها با کلیدِ یکسان‌شده حذف می‌شوند (نه فقط رشته‌ی عینی) —
+        # همان مسیر با شکلِ متفاوتِ جداکننده/حروف دو رکورد نمی‌شود.
+        nk = self.norm_path(path)
+        r = [p for p in self.recents() if self.norm_path(p) != nk]
         r.insert(0, path)
         self.config["recents"] = r[: self.RECENT_MAX]
         # عمداً _bump=False: بازدید محض «تغییر داده» محسوب نمی‌شود تا پشتیبانِ
         # خودکار بی‌دلیل بازنویسی نشود (قاعده‌ی کاربر: فقط وقتی تغییر واقعی).
         self.save_config(_bump=False)
+
+    def prune_recents(self, valid_paths) -> int:
+        """حذفِ مواردِ اخیرِ یتیم — round 32 (گزارش کاربر: «۱۵ ولی ۹»).
+
+        بعد از هر اسکنِ کامل صدا زده می‌شود: مسیرهایی که دیگر هیچ عنوانی از
+        کتابخانه نیستند (پوشه‌ی جابه‌جا/حذف‌شده/تغییرنام‌شده) بی‌صدا از عددِ
+        سایدبار حذف می‌شدند ولی در config می‌ماندند و همان ناهماهنگیِ عدد را
+        می‌ساختند. حالا خودِ تاریخچه پاک می‌شود تا «ذخیره‌شده == نمایش‌داده‌شده».
+        محافظت: اگر کتابخانه خالی است (اسکنِ ناموفق/درایوِ خاموش) هیچ‌چیز پاک
+        نمی‌شود تا یک خرابیِ موقت، تاریخچه را کلاً نابود نکند. تعدادِ حذف‌شده
+        برمی‌گردد."""
+        valid = {self.norm_path(p) for p in (valid_paths or [])}
+        if not valid:
+            return 0
+        kept, removed = [], 0
+        for p in self.recents():
+            if self.norm_path(p) in valid:
+                kept.append(p)
+            else:
+                removed += 1
+        if removed:
+            self.config["recents"] = kept
+            self.save_config(_bump=False)
+        return removed
 
     # ---- حذف/انتقال مورد (مدیر موارد گمشده — درخواست کاربر: «حذف» / «مسیر جدید»)
     def remove_item(self, path) -> bool:

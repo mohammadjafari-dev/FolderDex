@@ -409,6 +409,10 @@ EN = {
     "تاریک خنثی": "Dark Gray",
     "مشکی خالص": "Pure Black (AMOLED)",
     "روشن": "Light",
+    "جنگل": "Forest",
+    "غروب": "Sunset",
+    "اقیانوس": "Ocean",
+    "کاغذ": "Paper",
     "خودکار — بر اساس نوع فایل": "Auto — by file type",
     "دیده شده": "Watched",
     "نیمه‌تمام": "In progress",
@@ -590,4 +594,15 @@ EN = {
     "حذف": "Delete",
     # ---- لایسنس/سورس در کارتِ نسخه‌ی تنظیمات (round 13 §۷) ----
     "GPL-3.0-or-later · سورس: {0}": "GPL-3.0-or-later · source: {0}",
+    # ---- round 32 — نشانِ کاور روی کارتِ فایل + بجِ پیشرفتِ کتاب ----
+    "کاور": "Cover",
+    "صفحه‌ی {0}": "Page {0}",
+    # ---- round 32 — رنگِ دسته‌ها (تبِ دسته‌های تنظیمات) ----
+    "🎨 رنگِ دسته": "🎨 Category color",
+    "🎨 رنگِ دسته — انتخاب رنگ، بازگشت به خودکار، کپیِ کد":
+        "🎨 Category color — choose, back to automatic, copy code",
+    "انتخاب رنگ…": "Choose color…",
+    "بازگشت به رنگِ خودکار": "Back to automatic color",
+    "کپی کد رنگ": "Copy color code",
+    "رنگِ این دسته از پالتِ خودکار برنامه برمی‌دارد — همان رنگِ قبل بماند": "Keep this category's automatic palette color",
 }
