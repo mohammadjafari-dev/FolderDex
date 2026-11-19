@@ -1,0 +1,56 @@
+__pycache__/
+*.pyc
+.venv/
+build/
+dist/
+.thumb_cache/
+demo_library/
+config.json
+data.json
+config.demo.json
+data.demo.json
+data.demo.db
+.build-venv/
+# Vendored plugins (e.g. pillow_jxl) stay local only — they never enter git:
+# heavy Windows binaries with no SPDX header that would break the repo
+# integrity test; BUILD.bat no longer references this folder at all.
+vendor/
+folderdex-debug.log
+folderdex-error.log
+folderdex-launcher.log
+folderdex-diag.log
+covershelf-debug.log
+covershelf-error.log
+covershelf-launcher.log
+covershelf-diag.log
+media-cataloger-debug.log
+media-cataloger-error.log
+*.spec
+*-win64-portable.zip
+
+# --- local personal data next to the app — never commit ---
+data.db
+data.db-shm
+data.db-wal
+data.db-journal
+backups/
+*.mcbak
+.mc_import_*
+.no_archive_pkgs
+.covers/
+.requirements_failed
+.coverage
+htmlcov/
+coverage.json
+pytest-output.txt
+*.pre-canonical.bak
+
+# --- local-only working artifacts ---
+# Local working notes and scratch sheets stay out of the public repo; these
+# rules keep them unpicked even by `git add -A`.
+*-audit*.md
+*-report*.md
+_READ-ME-FIRST*
+# Patches must never enter the repo via a careless `git add .`; every patch
+# stays a local working file, so this rule keeps *.patch out unconditionally.
+*.patch

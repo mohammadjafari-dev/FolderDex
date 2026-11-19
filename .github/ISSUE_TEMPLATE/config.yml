@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 📖 Contributing guide / راهنمای مشارکت
+    url: https://github.com/mohammadjafari-dev/FolderDex/blob/main/CONTRIBUTING.md
+    about: Please read before opening an issue or pull request / لطفاً پیش از ثبت Issue یا Pull Request این را بخوانید

@@ -1,0 +1,30 @@
+name: "✨ Feature request (English)"
+description: Suggest an idea that would make FolderDex better
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: The problem
+      description: |
+        What are you trying to do, and what stands in the way?
+        "I can't find X" is more useful than "add button Y".
+      placeholder: "e.g. finding unsorted folders takes too long when the library grows …"
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Suggested solution
+      description: What would you like to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you've considered (optional)
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context (optional)
+      description: Screenshots welcome — remove personal paths first.

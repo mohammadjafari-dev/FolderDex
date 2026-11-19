@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: GPL-3.0-or-later
+# SPDX-FileCopyrightText: 2026 Mohammad Jafari
+
+# Dependabot version updates are intentionally disabled: both ecosystems set
+# open-pull-requests-limit to 0, so Dependabot never opens weekly bump PRs
+# and the pull request list stays clean for real contributions. Security
+# updates are governed separately (fixed limit of 10) and still work; alerts
+# continue to appear in the Security tab.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    open-pull-requests-limit: 0
+    schedule:
+      interval: weekly
+  - package-ecosystem: pip
+    directory: /
+    open-pull-requests-limit: 0
+    schedule:
+      interval: weekly
+    # shiboken6 6.12.0 crashes Python 3.11 at interpreter shutdown, so
+    # requirements.txt pins PySide6-Essentials with
+    # python_version markers; a repo-integrity test and a CI guard step assert
+    # those exact lines. Dependabot's blanket bump edits the marker line and
+    # turned every job red (branch dependabot/pip/pyside6-essentials-…, commit
+    # 8cf48fc) — this pin is managed by hand, so keep it out of version updates.
+    ignore:
+      - dependency-name: pyside6-essentials

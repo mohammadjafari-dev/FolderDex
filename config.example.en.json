@@ -1,0 +1,35 @@
+{
+  "roots": [
+    {
+      "path": "D:/Anime",
+      "category": "Anime"
+    },
+    {
+      "path": "E:/Movies",
+      "category": "Movies"
+    },
+    {
+      "path": "E:/Games",
+      "category": "Games"
+    },
+    {
+      "path": "F:/Courses",
+      "category": "Courses"
+    }
+  ],
+  "categories": [
+    "Anime",
+    "Movies",
+    "Games",
+    "Courses"
+  ],
+  "category_colors": {
+    "Anime": "#a78bfa",
+    "Movies": "#38bdf8",
+    "Games": "#4ade80",
+    "Courses": "#fbbf24"
+  },
+  "include_image_fallback": true,
+  "compute_durations": true,
+  "theme": "dark"
+}

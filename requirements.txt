@@ -1,0 +1,44 @@
+# Version caps: an unannounced major jump (e.g. pypdfium2 4->5, Pillow
+# 10->12) can change the API and break the app silently; a major cap means
+# "patches and minors free, only majors locked". BUILD.bat installs this file.
+PySide6-Essentials>=6.6,<6.12; python_version < "3.12"
+PySide6-Essentials>=6.6,<7; python_version >= "3.12"
+# Why the 6.12 cap on Python 3.11: shiboken6 6.12.0 corrupts bool refcounts at
+# interpreter shutdown on 3.11 (Signal(object) -> "Fatal Python error:
+# bool_dealloc" on app/test exit) — an upstream shiboken bug; absent in 6.11.3
+# and older, and on 3.12/3.13. The python_version marker solves this at install
+# time; the CI step also asserts the shiboken6 version after installing on 3.11.
+# The old cap <13 kept Pillow 12.x on machines, but
+# pip-audit reports 42 known advisories on 12.3.0, all fixed in 13.0.0; the
+# code only uses stable Pillow APIs (covers/thumbs/imgcache/filethumbs) and
+# the full test suite passes on 13.0.0 
+Pillow>=13.0,<14
+# Security floors, not style: py7zr <1.1.3 carries three published CVEs
+# (arbitrary file write CVE-2026-23879, O(n^2) PackInfo DoS CVE-2026-55206,
+# decompression-bomb CVE-2026-55195) and <1.1.4 three more GHSA fixes (write
+# outside the extraction dir, crafted-header memory exhaustion, crafted-COPY
+# hang); 1.1.3 also added the max_extract_size constructor guard that
+# filethumbs.py passes. rarfile <4.3 allows a symlink escape on extraction,
+# and <4.5 mishandles oversized archive comments and NUL file names —
+# exactly what FolderDex reads via infolist(). pypdfium2 5.15.2 fixes objects
+# staying alive at interpreter shutdown.
+py7zr>=1.1.4,<2
+rarfile>=4.5,<5
+pypdfium2>=5.15.2,<6
+# Why Essentials and not the PySide6 meta-package? The whole app only imports
+# from QtCore/QtGui/QtWidgets (import scan over every .py file); the meta-package
+# additionally pulls the Addons, Pdf and WebEngine wheels (about 170MB extra
+# download, including a full Chromium) that are never imported anywhere.
+#
+# Why WebP for the cache and not JPEG XL: on real 160-512px thumbnails WebP is
+# both smaller (poster 8.2KB vs 10.0KB, icon 2.3KB vs 4.2KB) and natively
+# decodable in Qt (1.0ms vs 4.7ms via PIL). JXL was only smaller than PNG and
+# needed a native plugin + 6 DLL files.
+#
+# Every line here is core — thumbnails are mandatory for every thumbnailable
+# file, and if pip fails, run.bat stops with a clear message instead of
+# skipping silently:
+#   py7zr / rarfile -> the in-process extraction backend for 7z and RAR (the
+#     thumbnail engine's safety net; listing every format is done by the
+#     bundled 7za.exe)
+#   pypdfium2 -> first-page PDF rendering
